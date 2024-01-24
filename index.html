@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recommendation Game</title>
+  </head>
+  <body>
+    <script>
+      // Function to parse URL parameters
+      function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+          results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return "";
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+      }
+      // Hardcoded codes and associated recommendations
+      const playerData = {
+        // S
+        23847: {
+          riddle: "Nuria, Clara, _, Jess, Faith.",
+          answer: "tere",
+          recommendations: {
+            movies: [
+              { title: "Player 1 Movie 1", description: "" },
+              { title: "Player 1 Movie 2", description: "" },
+              { title: "Player 1 Movie 3", description: "" },
+            ],
+            series: [
+              {
+                title: "Breaking Bad",
+                description:
+                  "Un buen equilibrio entre acción, desarrollo de personajes y algo de moralidad.",
+              },
+            ],
+            albums: [
+              { title: "Player 1 Album 1", description: "" },
+              { title: "Player 1 Album 2", description: "" },
+              { title: "Player 1 Album 3", description: "" },
+            ],
+            videogames: [
+              {
+                title: "Left 4 Dead 2",
+                description:
+                  "Cooperativo con amigos para risas o para competir. Como el modo zombies del COD",
+              },
+            ],
+          },
+        },
+        // A
+        34738: {
+          riddle: "",
+          answer: "",
+          recommendations: {
+            movies: [
+              { title: "Player 2 Movie 1", description: "" },
+              { title: "Player 2 Movie 2", description: "" },
+              { title: "Player 2 Movie 3", description: "" },
+            ],
+            albums: [
+              { title: "Player 2 Album 1", description: "" },
+              { title: "Player 2 Album 2", description: "" },
+              { title: "Player 2 Album 3", description: "" },
+            ],
+            videogames: [
+              { title: "Player 2 Game 1", description: "" },
+              { title: "Player 2 Game 2", description: "" },
+              { title: "Player 2 Game 3", description: "" },
+            ],
+          },
+        },
+        // M
+        59594: {
+          riddle: "¿Quién escuchó caer la caca?", // Mauro. quién cagó fuera, qué estaba probando david? una cosa
+          answer: "david",
+          recommendations: {
+            movies: [
+              { title: "Player 3 Movie 1", description: "" },
+              { title: "Player 3 Movie 2", description: "" },
+              { title: "Player 3 Movie 3", description: "" },
+            ],
+            series: [
+              { title: "Euphoria", description: "La forma más que el fondo."},
+              { title: "Normal People", description: "La forma más que el fondo."},
+            ],
+            albums: [
+              { title: "Player 3 Album 1", description: "" },
+              { title: "Player 3 Album 2", description: "" },
+              { title: "Player 3 Album 3", description: "" },
+            ],
+            videogames: [{ title: "Batman Arkham", description: "" }],
+          },
+        },
+      };
+
+      // Array of random messages for alerts
+      const alertMessages = [
+        "Qué mirás bobo, no",
+        "MATUPIPE, no",
+        "Sii.. QUE NOOOO PAYASX, no",
+        "Nope",
+        "Muajajaj no.",
+        "Que no...",
+        "No.",
+        "Siempre puedes hackearme :)",
+        "NO",
+        "NO!",
+      ];
+
+      // Main function to handle the game
+      function startGame() {
+        // Get the code from the URL
+        const code = getParameterByName("code");
+
+        // Display the form and recommendations corresponding to the code
+        if (code !== null && playerData.hasOwnProperty(code)) {
+          const player = playerData[code];
+
+          const form = document.createElement("form");
+          form.onsubmit = function () {
+            // This prevents the form from being submitted
+            return false;
+          };
+          form.innerHTML = `
+                    <label for="answer">Respuesta:</label>
+                    <input type="text" id="answer" name="answer" required>
+                    <button type="button" onclick="checkAnswer(${code})">Enviar</button>
+                `;
+          document.body.appendChild(form);
+
+          const riddle = document.createElement("p");
+          riddle.textContent = player.riddle;
+          document.body.appendChild(riddle);
+        } else {
+          // Invalid code, display an error message
+          const errorMessage = document.createElement("p");
+          errorMessage.textContent = "Código inválido";
+          document.body.appendChild(errorMessage);
+        }
+      }
+
+      // Function to check the answer and display recommendations
+      function checkAnswer(code) {
+        const player = playerData[code];
+        const answer = document.getElementById("answer").value.toLowerCase();
+
+        if (player.answer === answer) {
+          // Correct answer, display recommendations
+          const recommendationContainer = document.createElement("div");
+
+          for (const category in player.recommendations) {
+            const categoryTitle = document.createElement("h3");
+            categoryTitle.textContent =
+              category.charAt(0).toUpperCase() + category.slice(1);
+            recommendationContainer.appendChild(categoryTitle);
+
+            const reccomendationList = document.createElement("ul");
+            player.recommendations[category].forEach((item) => {
+              const recommendationItem = document.createElement("li");
+              recommendationItem.innerHTML = `<strong>${item.title}:</strong> ${item.description}`;
+              reccomendationList.appendChild(recommendationItem);
+            });
+            recommendationContainer.appendChild(reccomendationList);
+          }
+
+          document.body.innerHTML = "<h1>Buenaaa</h1>";
+          document.body.appendChild(recommendationContainer);
+        } else {
+          // Incorrect answer, display a random message in the alert
+          const randomMessage =
+            alertMessages[Math.floor(Math.random() * alertMessages.length)];
+          alert(randomMessage);
+        }
+      }
+
+      // Start the game when the page loads
+      window.onload = startGame;
+    </script>
+  </body>
+</html>
